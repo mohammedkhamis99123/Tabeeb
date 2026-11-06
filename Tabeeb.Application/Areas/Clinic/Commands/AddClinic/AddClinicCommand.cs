@@ -10,6 +10,7 @@ using System.Text;
 using Tabeeb.Application.Common.Services;
 using Tabeeb.Domain.Common;
 using Tabeeb.Domain.Entities;
+using Tabeeb.Domain.Enums;
 
 namespace Tabeeb.Application.Areas.Clinic.Commands.AddClinic
 {
@@ -67,7 +68,8 @@ namespace Tabeeb.Application.Areas.Clinic.Commands.AddClinic
     public class AddClinicCommandHandler(IAppDbContext appDbContext,
         UserManager<AppUser> userManager,
         IEmailSender emailSender,
-        IInvoiceGenerator invoiceGenerator
+        IInvoiceGenerator invoiceGenerator,
+        IQrCodeGernerator qrCodeGernerator
         ) : IRequestHandler<AddClinicCommand, int>
     {
         public async Task<int> Handle(AddClinicCommand request, CancellationToken cancellationToken)
@@ -95,12 +97,27 @@ namespace Tabeeb.Application.Areas.Clinic.Commands.AddClinic
             }
 
             var package = await appDbContext.SubscriptionPackages.FirstOrDefaultAsync(a => a.Id == request.SubscriptionPackageId);
+
+            var Invoice = new SubscriptionInvoices
+            {
+                ClinicId = data.Id,
+                PackageId = request.SubscriptionPackageId,
+                TotalAmount = package.Price,
+                PaidAmount = package.Price,
+                Type = SubscriptionInvoiceType.New,
+
+
+            };
+            await appDbContext.SubscriptionInvoices.AddAsync(Invoice);
+            await appDbContext.SaveChangesAsync();
+
             var Subscription = new Subscriptions
             {
                 ClinicId = data.Id,
                 PackageID = request.SubscriptionPackageId,
                 EndAt = request.SubscriptionStartAt.AddDays(package.DurationInDays),
-                StartAt=request.SubscriptionStartAt
+                StartAt=request.SubscriptionStartAt,
+                InvoiceId=Invoice.Id
             };
             appDbContext.Subscriptions.Add(Subscription);
             await appDbContext.SaveChangesAsync();
@@ -108,12 +125,13 @@ namespace Tabeeb.Application.Areas.Clinic.Commands.AddClinic
             var invoiceModel = new SubscriptionInvoiceDto
             {
                 ClinicName = request.ArName,
-                InvoiceNumber = "11111",
+                InvoiceNumber = Invoice.Id.ToString(),
                 IssueDate = DateTime.UtcNow.AddHours(3),
                 PackageName = package.ArName,
                 PaidAmount = package.Price,
                 TotalAmount = package.Price,
-                QrCodeBytes = GenerateInvoiceQrCode("11111")
+                QrCodeBytes = await qrCodeGernerator.GetSubscriptionInvoiceQrCode(Invoice.Id.ToString()),
+
             };
            var InvoiceBytes= invoiceGenerator.GenerateSubscriptionInvoice(invoiceModel);
 
@@ -268,17 +286,6 @@ namespace Tabeeb.Application.Areas.Clinic.Commands.AddClinic
             await emailSender.SendEmail(ownerEmail,  body,Attachemnt);
         
     }
-        public byte[] GenerateInvoiceQrCode(string invoiceNumber)
-        {
-            // رابط الـ Web App الخاص بك (سواء كان على الـ Localhost أو السيرفر الحقيقي)
-            // هذا الرابط سيفتح صفحة ويب بتصميم الفاتورة الاحترافي مباشرة للعميل
-            string invoiceUrl = $"https://yourdomain.com/invoices/view/{invoiceNumber}";
-
-            using var qrGenerator = new QRCodeGenerator();
-            var qrData = qrGenerator.CreateQrCode(invoiceUrl, QRCodeGenerator.ECCLevel.Q);
-            var qrCode = new PngByteQRCode(qrData);
-
-            return qrCode.GetGraphic(20); // إرجاع الصورة كـ byte[] جاهزة لـ QuestPDF
-        }
+  
     }
 }

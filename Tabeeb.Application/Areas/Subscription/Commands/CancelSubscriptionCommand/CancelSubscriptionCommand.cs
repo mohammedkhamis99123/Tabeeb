@@ -20,7 +20,8 @@ namespace Tabeeb.Application.Areas.Subscription.Commands.CancelSubscriptionComma
    (IAppDbContext appDbContext,
    IStringLocalizer<SharedResource> localizer,
    IInvoiceGenerator invoiceGenerator,
-   IEmailSender emailSender)
+   IEmailSender emailSender,
+   IQrCodeGernerator qrCodeGernerator)
    : IRequestHandler<CancelSubscriptionCommand, byte[]>
     {
         public async  Task<byte[]> Handle(CancelSubscriptionCommand request, CancellationToken cancellationToken)
@@ -75,7 +76,7 @@ namespace Tabeeb.Application.Areas.Subscription.Commands.CancelSubscriptionComma
                 IssueDate = DateTime.UtcNow.AddHours(3),
                 PackageName = subscription.Package.ArName,
                 TotalAmount = subscription.Package.Price,
-                QrCodeBytes = GenerateInvoiceQrCode(Invoice.Id.ToString()),
+                QrCodeBytes = await qrCodeGernerator.GetSubscriptionInvoiceQrCode(Invoice.Id.ToString()),
                 Type = Domain.Enums.SubscriptionInvoiceType.Cancel,
                 DaysCount=days,
                 StartAt=subscription.StartAt.Value
@@ -238,17 +239,6 @@ namespace Tabeeb.Application.Areas.Subscription.Commands.CancelSubscriptionComma
             await emailSender.SendEmail(ownerEmail, body, Attachemnt);
 
         }
-        public byte[] GenerateInvoiceQrCode(string invoiceNumber)
-        {
-            // رابط الـ Web App الخاص بك (سواء كان على الـ Localhost أو السيرفر الحقيقي)
-            // هذا الرابط سيفتح صفحة ويب بتصميم الفاتورة الاحترافي مباشرة للعميل
-            string invoiceUrl = $"https://yourdomain.com/invoices/view/{invoiceNumber}";
 
-            using var qrGenerator = new QRCodeGenerator();
-            var qrData = qrGenerator.CreateQrCode(invoiceUrl, QRCodeGenerator.ECCLevel.Q);
-            var qrCode = new PngByteQRCode(qrData);
-
-            return qrCode.GetGraphic(20); // إرجاع الصورة كـ byte[] جاهزة لـ QuestPDF
-        }
     }
 }
