@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Tabeeb.Application/Tabeeb.Application.csproj" />
+  <Project Path="Tabeeb.Domain/Tabeeb.Domain.csproj" />
+  <Project Path="Tabeeb.Infrastructure/Tabeeb.Infrastructure.csproj" />
+  <Project Path="Tabeeb.Resources/Tabeeb.Resources.csproj" />
+  <Project Path="Tabeeb/Tabeeb.csproj" />
+</Solution>
