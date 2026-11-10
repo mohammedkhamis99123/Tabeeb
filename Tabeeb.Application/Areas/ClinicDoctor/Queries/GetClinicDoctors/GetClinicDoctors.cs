@@ -30,6 +30,8 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Queries.GetClinicDoctors
                     IdentityNumber = dc.Doctor.IdentityNumber,
                     IsActive = dc.IsActive,
                     SpecializationId = dc.Doctor.SpecializationId,
+                    SpecializationArName=dc.Doctor.Specialization.ArName,
+                    SpecializationEnName = dc.Doctor.Specialization.EnName,
                     SessionPrice = dc.SessionPrice,
                     SessionDuration = dc.SessionDuration,
                     DoctorStamp = dc.DoctorStamp,
@@ -42,8 +44,8 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Queries.GetClinicDoctors
                         .Select(wt => new ClinicDoctorWorktimeDto
                         {
                             DayOfWeek = wt.DayOfWeek,
-                            StartAt = wt.StartAt,
-                            EndAt = wt.EndAt
+                            StartAt = wt.StartAt.Value,
+                            EndAt = wt.EndAt.Value
                         }).ToList()
                 })
                 .ToListAsync(cancellationToken);

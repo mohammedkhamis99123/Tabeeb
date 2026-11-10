@@ -18,7 +18,7 @@ namespace Tabeeb.Application.Areas.Subscription.Queries.GetSubscriptionHistory
         {
             return await appDbContext.Subscriptions
                                      .Where(a => a.ClinicId == request.ClinicId)
-                                     .OrderBy(a => a.StartAt)
+                                     .OrderBy(a => a.Id)
                                      .Select(a => new SubscriptionDto
                                      {
                                          ClinicArName = a.Clinics.ArName,

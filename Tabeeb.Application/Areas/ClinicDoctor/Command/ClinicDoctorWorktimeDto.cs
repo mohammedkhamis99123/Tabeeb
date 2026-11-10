@@ -8,10 +8,10 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command
     {
         public DayOfWeek DayOfWeek { get; set; }
 
-        public TimeOnly StartAt { get; set; }
+        public TimeOnly? StartAt { get; set; }
 
 
-        public TimeOnly EndAt { get; set; }
+        public TimeOnly? EndAt { get; set; }
     }
 
   

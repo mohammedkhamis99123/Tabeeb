@@ -9,10 +9,10 @@ namespace Tabeeb.Domain.Entities
     {
         public DayOfWeek DayOfWeek { get; set; }
 
-        public TimeOnly StartAt { get; set; }
+        public TimeOnly? StartAt { get; set; }
 
 
-        public TimeOnly EndAt { get; set; }
+        public TimeOnly? EndAt { get; set; }
 
         public bool IsActive {  get; set; }
 

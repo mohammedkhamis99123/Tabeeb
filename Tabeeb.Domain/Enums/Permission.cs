@@ -49,7 +49,12 @@ namespace Tabeeb.Domain.Enums
         AddSubscriptionPackage,
         UpdateSubscriptionPackage,
         DeleteSubscriptionPackage,
-
+        AddSubscription,
+        CancelSubscription,
+        RenewSubscription,
+        ShowSubscriptionInvoice,
+        ShowSubscriptionHistory
+      
 
 
 

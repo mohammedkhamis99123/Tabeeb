@@ -15,7 +15,9 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command
 
         public byte SpecializationId { get; set; }
 
+        public string SpecializationArName {  get; set; } = null!;
 
+        public string SpecializationEnName { get; set; }
         public string IdentityNumber { get; set; } = null!;
         public IFormFile Image { get; set; } 
 

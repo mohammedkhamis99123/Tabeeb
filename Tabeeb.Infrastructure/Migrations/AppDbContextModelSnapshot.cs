@@ -753,13 +753,13 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.Property<int>("DoctorID")
                         .HasColumnType("int");
 
-                    b.Property<TimeOnly>("EndAt")
+                    b.Property<TimeOnly?>("EndAt")
                         .HasColumnType("time");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<TimeOnly>("StartAt")
+                    b.Property<TimeOnly?>("StartAt")
                         .HasColumnType("time");
 
                     b.Property<DateTime?>("UpdatedAt")

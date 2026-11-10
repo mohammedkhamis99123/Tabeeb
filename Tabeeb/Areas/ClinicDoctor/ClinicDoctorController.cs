@@ -17,12 +17,12 @@ namespace Tabeeb.Areas.ClinicDoctor
     public class ClinicDoctorController(ISender Sender) : ControllerBase
     {
 
-     
-        
 
-        [HttpGet]
+
+
+        [HttpGet("{ClinicId}")]
         [HasPermission(Domain.Enums.Permission.ViewClinicDoctors)]
-        public async Task<IActionResult> GrtClinicDoctor([FromQuery]GetClinicDoctors Query)
+        public async Task<IActionResult> GetClinicDoctor([FromRoute]GetClinicDoctors Query)
         {
             return await Sender.Send(Query).ToGenericReponse();
         }

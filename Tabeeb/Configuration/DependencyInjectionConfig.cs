@@ -14,6 +14,7 @@ namespace Tabeeb.Configuration
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IInvoiceGenerator, InvoiceGenerator>();
+            services.AddScoped<IQrCodeGernerator, QrCodeGenerator>();
             services.AddHttpContextAccessor();
         }
     }
