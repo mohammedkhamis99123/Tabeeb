@@ -619,7 +619,7 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("Tabeeb.Domain.Entities.Doctor", b =>
@@ -780,7 +780,7 @@ namespace Tabeeb.Infrastructure.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("DoctorWorkTimes");
+                    b.ToTable("DoctorWorkTimes", (string)null);
                 });
 
             modelBuilder.Entity("Tabeeb.Domain.Entities.Employee", b =>
@@ -1026,7 +1026,7 @@ namespace Tabeeb.Infrastructure.Migrations
 
                     b.HasIndex("IsActive", "DeletedAt");
 
-                    b.ToTable("Offers");
+                    b.ToTable("Offers", (string)null);
                 });
 
             modelBuilder.Entity("Tabeeb.Domain.Entities.PatientVital", b =>
@@ -1120,7 +1120,7 @@ namespace Tabeeb.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions");
+                    b.ToTable("Permissions", (string)null);
                 });
 
             modelBuilder.Entity("Tabeeb.Domain.Entities.Prescription", b =>

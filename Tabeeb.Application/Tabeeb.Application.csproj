@@ -32,4 +32,9 @@
     <ProjectReference Include="..\Tabeeb.Resources\Tabeeb.Resources.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Doctor\Commands\" />
+    <Folder Include="Areas\Doctor\Queries\GetDoctor\" />
+  </ItemGroup>
+
 </Project>

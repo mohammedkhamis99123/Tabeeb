@@ -53,7 +53,7 @@ namespace Tabeeb.Domain.Enums
         CancelSubscription,
         RenewSubscription,
         ShowSubscriptionInvoice,
-        ShowSubscriptionHistory
+        ShowSubscriptionHistory,
       
 
 

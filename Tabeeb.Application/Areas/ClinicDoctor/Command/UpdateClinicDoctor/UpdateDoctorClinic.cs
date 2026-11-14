@@ -15,16 +15,16 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.UpdateClinicDoctor
     {
         public int? DoctorId { get; set; }
 
-        //public string ArName { get; set; } = null!;
+        public string ArName { get; set; } = null!;
 
-        //public string EnName { get; set; } = null!;
+        public string EnName { get; set; } = null!;
 
-        //public byte SpecializationId { get; set; }
+        public byte SpecializationId { get; set; }
 
 
-        //public string IdentityNumber { get; set; } = null!;
+        public string IdentityNumber { get; set; } = null!;
 
-   
+
         public IFormFile? Image { get; set; }
 
         public IFormFile? Stamp { get; set; }
@@ -37,8 +37,8 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.UpdateClinicDoctor
 
         public bool IsActive { get; set; }
 
-        //public string Email { get; set; }
-        public DateTime JoinDate { get; set; }
+        public string Email { get; set; }
+      
 
         public int ClinicId { get; set; }
     }
@@ -62,15 +62,14 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.UpdateClinicDoctor
             if (existingDoctor == null)
                 return;
 
-            // أ) تحديث بيانات الـ Entity الخاصة بالطبيب
-            //existingDoctor.ArName = doctorDto.ArName;
-            //existingDoctor.EnName = doctorDto.EnName;
-            //existingDoctor.IdentityNumber = doctorDto.IdentityNumber;
-            existingDoctor.IsActive = doctorDto.IsActive;
-            //existingDoctor.SpecializationId = doctorDto.SpecializationId;
 
-            // ب) تحديث بيانات الـ AppUser الخاص به
-            //await UpdateDoctorUserAsync(doctorDto);
+           existingDoctor.ArName = doctorDto.ArName;
+            existingDoctor.EnName = doctorDto.EnName;
+            existingDoctor.IdentityNumber = doctorDto.IdentityNumber;
+            existingDoctor.IsActive = doctorDto.IsActive;
+            existingDoctor.SpecializationId = doctorDto.SpecializationId;
+
+            await UpdateDoctorUserAsync(doctorDto);
 
             // ج) تحديث مواعيد العمل (حذف القديم وإضافة الجديد)
             //await UpdateDoctorWorkTimesAsync(doctorDto, cancellationToken);
@@ -81,25 +80,25 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.UpdateClinicDoctor
             await appDbContext.SaveChangesAsync();
         }
 
-        //private async Task UpdateDoctorUserAsync(UpdateDoctorClinic doctorDto)
-        //{
-        //    if (string.IsNullOrEmpty(doctorDto.Email))
-        //        return;
+        private async Task UpdateDoctorUserAsync(UpdateDoctorClinic doctorDto)
+        {
+            if (string.IsNullOrEmpty(doctorDto.Email))
+                return;
 
-        //    var user = await userManager.FindByEmailAsync(doctorDto.Email);
-        //    if (user != null)
-        //    {
-        //        user.ArName = doctorDto.ArName;
-        //        user.EnName = doctorDto.EnName;
-        //        user.UserName = doctorDto.EnName.Trim().Replace(" ", "_");
-        //        user.Email = doctorDto.Email;
-        //        user.ClinicId = doctorDto.ClinicId;
-        //        await userManager.UpdateAsync(user);
-        //    }
-        //}
+            var user = await userManager.FindByEmailAsync(doctorDto.Email);
+            if (user != null)
+            {
+                user.ArName = doctorDto.ArName;
+                user.EnName = doctorDto.EnName;
+                user.UserName = doctorDto.EnName.Trim().Replace(" ", "_");
+                user.Email = doctorDto.Email;
+                user.ClinicId = doctorDto.ClinicId;
+                await userManager.UpdateAsync(user);
+            }
+        }
 
-     
-     
+
+
         private async Task UpdateDoctorClinicRelationAsync(UpdateDoctorClinic doctorDto, CancellationToken cancellationToken)
         {
             var existingDoctorClinic = await appDbContext.doctorClinics

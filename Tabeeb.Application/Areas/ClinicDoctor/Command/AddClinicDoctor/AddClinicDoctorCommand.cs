@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Tabeeb.Application.Common.Services;
 using Tabeeb.Domain.Entities;
+using Tabeeb.Resources;
 
 namespace Tabeeb.Application.Areas.ClinicDoctor.Command.AddClinicDoctor
 {
@@ -42,12 +44,16 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.AddClinicDoctor
     public class AddClinicDoctorCommandHandler(
       IAppDbContext appDbContext,
       UserManager<AppUser> userManager,
-      IFileService fileService)
+      IFileService fileService,
+      IStringLocalizer<SharedResource> localizer)
       : IRequestHandler<AddClinicDoctorCommand>
     {
         public async Task Handle(AddClinicDoctorCommand request, CancellationToken cancellationToken)
         {
-           await  ProcessNewDoctorAsync(request,cancellationToken);
+           
+                await ProcessNewDoctorAsync(request, cancellationToken);
+
+           
         }
 
         private async Task ProcessNewDoctorAsync(AddClinicDoctorCommand doctorDto, CancellationToken cancellationToken)
@@ -80,7 +86,7 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.AddClinicDoctor
                 }
 
                 // ب) إنشاء بيانات الطبيب
-                var doctorData = new Doctor
+                var doctorData = new Domain.Entities.Doctor
                 {
                     ArName = doctorDto.ArName,
                     EnName = doctorDto.EnName,
@@ -94,13 +100,13 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.AddClinicDoctor
                 appDbContext.Doctors.Add(doctorData);
                 await appDbContext.SaveChangesAsync(cancellationToken);
 
-                AddDoctorClinicRelation(doctorDto, doctorData.Id);
+               await AddDoctorClinicRelation(doctorDto, doctorData.Id);
 
             }
             else
             {
-                
-                AddDoctorClinicRelation(doctorDto, DoctorData.Doctor.Id);
+                throw new Exception(localizer["AlreadyUsedEmail"]);  
+              //await  AddDoctorClinicRelation(doctorDto, DoctorData.Doctor.Id);
 
             }
             // حفظ هنا لتوليد doctorData.Id
@@ -132,7 +138,7 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.AddClinicDoctor
         /// <summary>
         /// إنشاء رابط العيادة والطبيب DoctorClinic
         /// </summary>
-        private void AddDoctorClinicRelation(AddClinicDoctorCommand doctorDto, int doctorId)
+        private async Task AddDoctorClinicRelation(AddClinicDoctorCommand doctorDto, int doctorId)
         {
             var doctorClinic = new DoctorClinic
             {
@@ -148,7 +154,7 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.AddClinicDoctor
             };
 
             appDbContext.doctorClinics.Add(doctorClinic);
-            appDbContext.SaveChangesAsync();
+           await  appDbContext.SaveChangesAsync();
         }
 
     }
