@@ -87,7 +87,7 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.AddClinicDoctor
 
                 };
 
-                var password = GenerateSecurePassword();
+                var password = GenerateIdentityCompatiblePassword();
                 var userResult = await userManager.CreateAsync(user,password);
                 if (!userResult.Succeeded)
                 {
@@ -115,7 +115,7 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.AddClinicDoctor
 
 
 
-                await SendDoctorWelcomeEmail(DoctorData.Email, doctorData.ArName, clinic.ArName, password, "");
+                await SendDoctorWelcomeEmail(doctorDto.Email, doctorData.ArName, clinic.ArName, password, "");
 
             }
             else
@@ -151,27 +151,54 @@ namespace Tabeeb.Application.Areas.ClinicDoctor.Command.AddClinicDoctor
            await  appDbContext.SaveChangesAsync();
         }
 
-        public static string GenerateSecurePassword(int length = 12)
+
+
+public static string GenerateIdentityCompatiblePassword(int length = 10)
+    {
+        // التأكد من أن الطول لا يقل عن 8 خانات حسب إعداداتك
+        if (length < 8) length = 8;
+
+        const string uppercaseChars = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
+        const string lowercaseChars = "abcdefghijkmnopqrstuvwxyz";
+        const string digitChars = "0123456789";
+        const string allChars = uppercaseChars + lowercaseChars + digitChars;
+
+        var passwordChars = new char[length];
+
+        using (var rng = RandomNumberGenerator.Create())
         {
-            const string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*_-+=?";
-            var chars = new char[length];
+            byte[] data = new byte[length];
+            rng.GetBytes(data);
 
-            using (var rng = RandomNumberGenerator.Create())
+            // 1. ضمان وجود حرف كبير واحد على الأقل (استجابة لـ RequireUppercase)
+            passwordChars[0] = uppercaseChars[data[0] % uppercaseChars.Length];
+
+            // 2. ضمان وجود حرف صغير واحد على الأقل (استجابة لـ RequireLowercase)
+            passwordChars[1] = lowercaseChars[data[1] % lowercaseChars.Length];
+
+            // 3. ضمان وجود رقم واحد على الأقل (استجابة لـ RequireDigit)
+            passwordChars[2] = digitChars[data[2] % digitChars.Length];
+
+       // 4. ملء باقي الحروف عشوائياً من المجموعات الكلية
+        for (int i = 3; i < length; i++)
             {
-                byte[] data = new byte[length];
-                rng.GetBytes(data);
-
-                for (int i = 0; i < length; i++)
-                {
-                    // Map the random byte to an index within our valid characters string
-                    chars[i] = validChars[data[i] % validChars.Length];
-                }
+                passwordChars[i] = allChars[data[i] % allChars.Length];
             }
 
-            return new string(chars);
+            // 5. خلط عناصر مصفوفة الحروف عشوائياً حتى لا تكون الشروط ثابتة في البداية
+            for (int i = length - 1; i > 0; i--)
+            {
+                int j = data[i] % (i + 1);
+                char temp = passwordChars[i];
+                passwordChars[i] = passwordChars[j];
+                passwordChars[j] = temp;
+            }
         }
 
-        private async Task SendDoctorWelcomeEmail(string doctorEmail, string doctorName, string clinicName, string tempPassword, string loginUrl)
+        return new string(passwordChars);
+    }
+
+    private async Task SendDoctorWelcomeEmail(string doctorEmail, string doctorName, string clinicName, string tempPassword, string loginUrl)
         {
             var body = $@"
     <!DOCTYPE html>
