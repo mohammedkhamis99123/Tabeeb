@@ -32,7 +32,6 @@ namespace Tabeeb.Application.Areas.Employee.Commands.AddEmployee
                .MaximumLength(250).WithMessage(localizer["MaxLength", 250]);
 
 
-            // 3. البريد الإلكتروني (مطلوب ولابد أن يكون صيغة بريد صحيحة)
             RuleFor(d => d.Email)
                  .NotEmpty()
                  .WithMessage(localizer["EmailRequired"])

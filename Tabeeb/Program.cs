@@ -34,8 +34,8 @@ if (File.Exists(fontPath))
     using var stream = File.OpenRead(fontPath);
     FontManager.RegisterFont(stream);
 }
-ClinicMapping.Run();
-OfferMapping.Run();
+
+MappingConfig.Run();
 
 
 
