@@ -14,6 +14,9 @@
 
         public int DoctorId { get; set; }
 
+       public string DoctorArName {  get; set; }
+
+        public string DoctorEnName {  get; set; }
 
         public int ClinicId { get; set; }
     }

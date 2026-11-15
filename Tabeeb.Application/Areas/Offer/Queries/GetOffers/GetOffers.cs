@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -29,9 +30,13 @@ namespace Tabeeb.Application.Areas.Offer.Queries.GetOffers
         public async Task<PaginatedList<OfferDto>> Handle(GetOffers request, CancellationToken cancellationToken)
         {
             return await appDbContext.Offers
+                          .Include(a => a.Doctor)
                          .Where(a => !request.From.HasValue || a.StartAt >= request.From)
                          .Where(a => !request.To.HasValue || a.EndAt <= request.To)
                          .Where(A => !request.IsActive.HasValue || A.IsActive == request.IsActive)
+                         .Where(a => request.SearchTerm.Trim() == "" ||
+                           a.Doctor.ArName.Contains(request.SearchTerm)
+                         ||a.Doctor.EnName.Contains(request.SearchTerm))
                          .OrderData(request.SortBy, request.SortOrder)
                          .ProjectToType<OfferDto>()
                          .PaginateAsync(request.Page, request.PageSize);

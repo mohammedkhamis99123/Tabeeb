@@ -24,6 +24,7 @@ namespace Tabeeb.Application.Areas.Offer.Commands.AddOffer
         public int DoctorId { get; set; }
 
 
+
     }
 
     public class AddOfferCommandHandler
@@ -34,6 +35,7 @@ namespace Tabeeb.Application.Areas.Offer.Commands.AddOffer
     {
         public async Task Handle(AddOffer request, CancellationToken cancellationToken)
         {
+
             var data = request.Adapt<Domain.Entities.Offer>();
             data.ClinicId = currentUserService.ClinicId.Value;
 

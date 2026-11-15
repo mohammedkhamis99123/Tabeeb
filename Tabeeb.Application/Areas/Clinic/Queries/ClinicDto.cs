@@ -49,6 +49,7 @@ namespace Tabeeb.Application.Areas.Clinic.Queries
 
         public string? ProfileEn { get; set; }
 
+       
         public bool IsActive {  get; set; }
 
         public int DoctorsCount {  get; set; }

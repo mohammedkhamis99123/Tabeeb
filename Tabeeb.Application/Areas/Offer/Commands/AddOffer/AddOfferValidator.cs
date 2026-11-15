@@ -12,13 +12,15 @@ namespace Tabeeb.Application.Areas.Offer.Commands.AddOffer
     {
         private readonly IAppDbContext appDbContext;
         private readonly IStringLocalizer<SharedResource> localizer;
+        private readonly ICurrentUserService currentUserService;
 
         public AddOfferValidator(IAppDbContext appDbContext
-            ,IStringLocalizer<SharedResource> localizer)
+            ,IStringLocalizer<SharedResource> localizer
+            ,ICurrentUserService currentUserService)
         {
             this.appDbContext = appDbContext;
             this.localizer = localizer;
-
+            this.currentUserService = currentUserService;
             RuleFor(X => X.StartAt)
                 .NotEmpty()
                 .WithMessage(localizer["Required"]);
@@ -38,12 +40,27 @@ namespace Tabeeb.Application.Areas.Offer.Commands.AddOffer
                 .NotEmpty()
                 .WithMessage(localizer["required"]);
 
-
+            RuleFor(x => x)
+                .Must((x) => ValidateCycle(x))
+                .WithMessage(localizer["AlreadyDefindOfferAtThatTime"]);
 
 
             
 
 
+        }
+
+        private bool ValidateCycle(AddOffer x)
+        {
+            return !appDbContext
+                .Offers.Any(a => a.DoctorId == x.DoctorId
+                && a.ClinicId == currentUserService.ClinicId
+                && a.IsActive
+                &&(( x.EndAt <= a.EndAt && x.StartAt>=a.StartAt)
+                ||(a.StartAt >= x.StartAt && a.EndAt<=x.EndAt ) 
+                || (x.StartAt >=a.StartAt && x.EndAt>=a.EndAt)
+                || (x.StartAt <= a.StartAt && x.EndAt <= a.EndAt))
+               );
         }
     }
 }

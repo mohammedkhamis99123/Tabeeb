@@ -35,6 +35,7 @@ if (File.Exists(fontPath))
     FontManager.RegisterFont(stream);
 }
 ClinicMapping.Run();
+OfferMapping.Run();
 
 
 
