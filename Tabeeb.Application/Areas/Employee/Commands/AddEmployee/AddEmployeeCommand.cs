@@ -21,6 +21,7 @@ namespace Tabeeb.Application.Areas.Employee.Commands.AddEmployee
 
         public string Addrees { get; set; } = null!;
 
+        public string PhoneNumber { get; set; } = null!;
 
         public bool IsActive { get; set; }
 
@@ -61,7 +62,10 @@ namespace Tabeeb.Application.Areas.Employee.Commands.AddEmployee
            appDbContext.Employees.Add(data);
            await appDbContext.SaveChangesAsync();
 
-                
+          
+
+
+
         }
 
         private async Task<string> AddEmployeeUser(AddEmployeeCommand request)
@@ -80,7 +84,7 @@ namespace Tabeeb.Application.Areas.Employee.Commands.AddEmployee
             var password = GenerateIdentityCompatiblePassword();
             var userResult = await userManager.CreateAsync(user,password);
 
-            var role = await roleManager.FindByIdAsync(request.Role);
+            var role = await roleManager.FindByNameAsync(request.Role);
             await userManager.AddToRoleAsync(user, role.Name);
             if (!userResult.Succeeded)
             {
@@ -88,9 +92,8 @@ namespace Tabeeb.Application.Areas.Employee.Commands.AddEmployee
                 throw new Exception($"Failed to create user for doctor {request.EnName}: " +
                                     string.Join(", ", userResult.Errors.Select(e => e.Description)));
             }
-
-            var clinicName = appDbContext.Clinics.FirstOrDefault(a => a.Id == currentUser.ClinicId).ArName;
-            await SendEmployeeWelcomeEmail(request.Email, request.ArName,clinicName,password,"..");
+            var clinicName = appDbContext.Clinics.FirstOrDefault(a => a.Id == currentUser.ClinicId.Value).ArName;
+            await SendEmployeeWelcomeEmail(request.Email, request.ArName, clinicName, password, "..");
             return user.Id;
 
         }

@@ -11,6 +11,7 @@ namespace Tabeeb.Configuration
         {
             ClinicMapping.Run();
             OfferMapping.Run();
+            EmployeeMapping.Run();
 
         }
 

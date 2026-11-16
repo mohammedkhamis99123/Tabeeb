@@ -13,10 +13,11 @@ namespace Tabeeb.Application.Areas.Employee.Queries
 
         public string EnName { get; set; } = null!;
 
-
+        public string Role {  get; set; } = null!;
 
         public string Addrees { get; set; } = null!;
 
+        public string PhoneNumber {  get; set; } = null!;
 
         public bool IsActive { get; set; }
 

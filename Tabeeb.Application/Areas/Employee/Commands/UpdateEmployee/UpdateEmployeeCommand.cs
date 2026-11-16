@@ -21,6 +21,7 @@ namespace Tabeeb.Application.Areas.Employee.Commands.UpdateEmployee
 
         public string EnName { get; set; } = null!;
 
+        public string PhoneNumber { get; set; } = null!;
 
 
         public string Addrees { get; set; } = null!;
@@ -80,13 +81,12 @@ namespace Tabeeb.Application.Areas.Employee.Commands.UpdateEmployee
 
             var user = await userManager.FindByEmailAsync(request.Email);
 
-            var role = await roleManager.Roles.Where(a => a.Id == request.Role).FirstOrDefaultAsync();
 
             var currentRoles = await userManager.GetRolesAsync(user);
             if (currentRoles.Count > 0)
                 await userManager.RemoveFromRolesAsync(user, currentRoles);
 
-            await userManager.AddToRoleAsync(user, role.Name);
+            await userManager.AddToRoleAsync(user, request.Role);
 
 
            

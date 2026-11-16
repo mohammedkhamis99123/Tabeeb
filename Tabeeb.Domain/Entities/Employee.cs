@@ -26,6 +26,7 @@ namespace Tabeeb.Domain.Entities
 
         public string IdentityNumber { get; set; } = null!;
 
+        public string PhoneNumber {  get; set; } = null!;
         public string UserId { get; set; } = null!;
         public AppUser AppUser { get; set; } = null!;
         public Clinic Clinics { get; set; } = null!;
