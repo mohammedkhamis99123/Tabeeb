@@ -28,7 +28,12 @@ namespace Tabeeb.Application.Areas.Customer.Queries.GetCustomers
             a.ArName.Contains(request.SearchTerm) ||
             a.EnName.Contains(request.SearchTerm) ||
             a.IdentityNumber.Contains(request.SearchTerm) ||
-            a.Email.Contains(request.SearchTerm)))
+            a.Email.Contains(request.SearchTerm)
+            || a.ClinicCustomer
+               .Where(c => c.ClinicId == currentUserService.ClinicId)
+               .Select(c => c.MedicalFile)
+               .FirstOrDefault().ToString().Contains(request.SearchTerm)
+            ))
  
        .Select(a => new CustomerDto
        {

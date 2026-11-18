@@ -11,7 +11,13 @@ namespace Tabeeb.Application.Areas.Customer.Commands.AddCustomerCommand
 {
     public  class AddCustomerValidator:AbstractValidator<AddCustomerCommand>
     {
-        public AddCustomerValidator(IAppDbContext appDbContext,IStringLocalizer<SharedResource> localizer)
+        private readonly IAppDbContext appDbContext;
+        private readonly IStringLocalizer<SharedResource> localizer;
+        private readonly ICurrentUserService currentUserService;
+
+        public AddCustomerValidator(IAppDbContext appDbContext
+            ,IStringLocalizer<SharedResource> localizer
+            ,ICurrentUserService currentUserService)
         {
             RuleFor(a => a.ArName)
                 .NotEmpty()
@@ -37,10 +43,9 @@ namespace Tabeeb.Application.Areas.Customer.Commands.AddCustomerCommand
             RuleFor(a => a.PhoneNumber)
            .NotEmpty()
            .WithMessage(localizer["Required"])
-           .MaximumLength(150)
-           .WithMessage(localizer["maxLength", 250])
-           .Matches(@"^(?:\+966|00966|0)?5\d{8}$")
-            .WithMessage(localizer["InvalidSaudiPhoneNumber"]);
+           .MaximumLength(20)
+           .WithMessage(localizer["maxLength", 20]);
+        
 
 
 
@@ -51,15 +56,26 @@ namespace Tabeeb.Application.Areas.Customer.Commands.AddCustomerCommand
          .WithMessage(localizer["InvalidEmail"]);
 
 
-            string saudiIdentityPattern = @"^[12]\d{9}$";
+
 
             RuleFor(a => a.IdentityNumber)
                 .NotEmpty()
+                .WithMessage(localizer["Required"]);
+
+
+            RuleFor(x => x.MedicalFile)
+                .NotEmpty()
                 .WithMessage(localizer["Required"])
-                .Matches(saudiIdentityPattern)
-                .WithMessage(localizer["InvalidIdentityNumber"]); // رسالة: رقم الهوية أو الإقامة غير صحيح
+                .Must((medicalfile)=>IsValidMedicalFile(medicalfile))
+                .WithMessage(localizer["AlreadyUsedMedicalFile"]);
+            this.appDbContext = appDbContext;
+            this.localizer = localizer;
+            this.currentUserService = currentUserService;
+        }
 
-
+        private bool IsValidMedicalFile(long medicalfile)
+        {
+            return !appDbContext.ClinicCustomers.Any(a=>a.MedicalFile== medicalfile && a.ClinicId==currentUserService.ClinicId);
         }
     }
 }

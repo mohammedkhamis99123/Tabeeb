@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Tabeeb.Application.Common.Services;
+using Tabeeb.Domain.Enums;
 using Tabeeb.Resources;
 
 namespace Tabeeb.Application.Areas.Employee.Commands.UpdateEmployee
@@ -43,7 +44,14 @@ namespace Tabeeb.Application.Areas.Employee.Commands.UpdateEmployee
                .NotEmpty()
                .WithMessage(localizer["Required"]);
 
+            RuleFor(x => x.Role)
+              .NotEmpty()
+              .WithMessage(localizer["Required"]);
 
+            RuleFor(x => x.DoctorId)
+                .NotEmpty()
+                .When(a => a.Role == Roles.DoctorAssistant)
+                .WithMessage(localizer["Required"]);
 
 
 
