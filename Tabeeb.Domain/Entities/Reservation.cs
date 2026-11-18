@@ -46,6 +46,7 @@ namespace Tabeeb.Domain.Entities
 
         public Offer Offer { get; set; }
 
+        public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
 
 
 

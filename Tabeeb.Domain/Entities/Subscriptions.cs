@@ -29,5 +29,8 @@ namespace Tabeeb.Domain.Entities
         public long InvoiceId {  get; set; }
 
         public SubscriptionInvoices Invoice { get; set; }
+
+        public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
+
     }
 }

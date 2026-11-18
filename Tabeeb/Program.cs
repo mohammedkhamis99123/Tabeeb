@@ -5,6 +5,7 @@ using System.Reflection;
 using Tabeeb.Application;
 using Tabeeb.Application.Mapping;
 using Tabeeb.Configuration;
+using Tabeeb.Domain.Common;
 using Tabeeb.Infrastructure.DbConfiguration;
 using Tabeeb.Middlewares;
 
@@ -37,7 +38,8 @@ if (File.Exists(fontPath))
 
 MappingConfig.Run();
 
-
+builder.Services.Configure<PaymobOptions>(
+    builder.Configuration.GetSection("Paymob"));
 
 var app = builder.Build();
 

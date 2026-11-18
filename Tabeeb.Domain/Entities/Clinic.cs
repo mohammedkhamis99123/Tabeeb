@@ -58,6 +58,7 @@ namespace Tabeeb.Domain.Entities
 
         public virtual ICollection<AppUser> Users { get; set; } = new List<AppUser>();
 
+        public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } =new List<PaymentTransaction>();
 
         public virtual ICollection<ClinicImage> Images { get; set; } = new List<ClinicImage>();
 
