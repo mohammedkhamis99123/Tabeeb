@@ -17,6 +17,8 @@ namespace Tabeeb.Application.Common
         public string CustomerEmail { get; set; } = null!;
 
         public string CustomerPhone { get; set; } = null!;
+
+        public string ItemName {  get; set; } = null!;
     }
 
     public class PaymentInitiationResult
@@ -26,5 +28,7 @@ namespace Tabeeb.Application.Common
         public string ClientSecret { get; set; } = null!;
 
         public string CheckoutUrl { get; set; } = null!;
+
+        public string OrderId {  get; set; } = null!;
     }
 }

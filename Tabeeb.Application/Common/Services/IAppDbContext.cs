@@ -54,6 +54,8 @@ namespace Tabeeb.Application.Common.Services
         DbSet<Offer> Offers { get; set; }
 
         DbSet<SubscriptionInvoices> SubscriptionInvoices { get; set; }
+
+        DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
         DbSet<TEntity> Set<TEntity>()

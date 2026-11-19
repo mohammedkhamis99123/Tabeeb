@@ -92,6 +92,7 @@ namespace Tabeeb.Infrastructure.DbContexts
         public DbSet<AppUser> Users { get; set; }
         
         public  DbSet<Offer> Offers { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
         public DbSet<SubscriptionInvoices> SubscriptionInvoices { get; set; }
 

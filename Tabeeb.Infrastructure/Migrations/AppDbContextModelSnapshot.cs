@@ -1106,6 +1106,105 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.ToTable("PatientVital", (string)null);
                 });
 
+            modelBuilder.Entity("Tabeeb.Domain.Entities.PaymentTransaction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("CheckoutUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ClinicId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeleterId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FailureReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProviderIntentionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProviderOrderId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProviderTransactionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("Purpose")
+                        .HasColumnType("tinyint");
+
+                    b.Property<Guid>("Reference")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("ReservationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<long?>("SubscriptionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdaterId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClinicId");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("DeleterId");
+
+                    b.HasIndex("ReservationId");
+
+                    b.HasIndex("SubscriptionId");
+
+                    b.HasIndex("UpdaterId");
+
+                    b.ToTable("PaymentTransactions");
+                });
+
             modelBuilder.Entity("Tabeeb.Domain.Entities.Permission", b =>
                 {
                     b.Property<byte>("Id")
@@ -2085,6 +2184,47 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.Navigation("Updater");
                 });
 
+            modelBuilder.Entity("Tabeeb.Domain.Entities.PaymentTransaction", b =>
+                {
+                    b.HasOne("Tabeeb.Domain.Entities.Clinic", "Clinic")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("ClinicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tabeeb.Domain.Entities.AppUser", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
+
+                    b.HasOne("Tabeeb.Domain.Entities.AppUser", "Deleter")
+                        .WithMany()
+                        .HasForeignKey("DeleterId");
+
+                    b.HasOne("Tabeeb.Domain.Entities.Reservation", "Reservation")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("ReservationId");
+
+                    b.HasOne("Tabeeb.Domain.Entities.Subscriptions", "Subscription")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("SubscriptionId");
+
+                    b.HasOne("Tabeeb.Domain.Entities.AppUser", "Updater")
+                        .WithMany()
+                        .HasForeignKey("UpdaterId");
+
+                    b.Navigation("Clinic");
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Deleter");
+
+                    b.Navigation("Reservation");
+
+                    b.Navigation("Subscription");
+
+                    b.Navigation("Updater");
+                });
+
             modelBuilder.Entity("Tabeeb.Domain.Entities.Prescription", b =>
                 {
                     b.HasOne("Tabeeb.Domain.Entities.AppUser", "Creator")
@@ -2506,6 +2646,8 @@ namespace Tabeeb.Infrastructure.Migrations
 
                     b.Navigation("Offers");
 
+                    b.Navigation("PaymentTransactions");
+
                     b.Navigation("Reservations");
 
                     b.Navigation("RolePermissions");
@@ -2567,6 +2709,8 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.Navigation("PatientVital")
                         .IsRequired();
 
+                    b.Navigation("PaymentTransactions");
+
                     b.Navigation("Prescription")
                         .IsRequired();
                 });
@@ -2587,6 +2731,11 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.Navigation("Invoices");
 
                     b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("Tabeeb.Domain.Entities.Subscriptions", b =>
+                {
+                    b.Navigation("PaymentTransactions");
                 });
 #pragma warning restore 612, 618
         }
