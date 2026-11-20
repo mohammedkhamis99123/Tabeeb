@@ -16,7 +16,9 @@ namespace Tabeeb.Infrastructure.DbConfiguration
                 opt.ToTable("Reservation");
                 opt.Property(a => a.Status).HasColumnType("tinyint");
                 opt.Property(a => a.Type).HasColumnType("tinyint");
-                opt.Property(A => A.TotalAmount).HasColumnType("decimal(5,2)");
+                
+                opt.Property(A => A.TotalAfterDiscount).HasColumnType("decimal(8,2)");
+                opt.Property(A => A.TotalBeforeDiscount).HasColumnType("decimal(8,2)");
 
                 opt.HasOne(A => A.Clinics)
                           .WithMany(A => A.Reservations)

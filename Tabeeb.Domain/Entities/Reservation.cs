@@ -9,11 +9,10 @@ namespace Tabeeb.Domain.Entities
     public  class Reservation:BaseAuditableEntity<long>
     {
 
-        public long  ReservationNo {  get; set; }
+       
         public DateTime Date {  get; set; }
 
         //public int ClinicId {  get; set; }
-
 
         public long CustomerId {  get; set; }
 
@@ -22,7 +21,7 @@ namespace Tabeeb.Domain.Entities
 
         public ReservationType Type { get; set; }
 
-        public decimal TotalAmount {  get; set; }
+        //public decimal TotalAmount {  get; set; }
 
         public int DoctorID {  get; set; }
 
@@ -45,6 +44,15 @@ namespace Tabeeb.Domain.Entities
 
 
         public Offer Offer { get; set; }
+
+
+        public decimal TotalBeforeDiscount { get; set; }
+
+       
+        public decimal TotalAfterDiscount { get; set; }
+
+
+
 
         public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
 

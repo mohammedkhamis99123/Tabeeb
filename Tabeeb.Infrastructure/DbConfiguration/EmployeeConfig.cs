@@ -16,6 +16,8 @@ namespace Tabeeb.Infrastructure.DbConfiguration
                 opt.Property(a => a.ArName).HasMaxLength(150);
                 opt.Property(a => a.EnName).HasMaxLength(150).IsUnicode(false);
                 opt.Property(a => a.Addrees).HasMaxLength(250);
+                opt.Property(a => a.Salary).HasColumnType("decimal(8,2)");
+                opt.Property(A => A.WorkHours).HasColumnType("decimal(4,2)");
                 opt.HasOne(a => a.Doctor)
                  .WithMany(A => A.Employees)
                    .HasForeignKey(a => a.DoctorId)

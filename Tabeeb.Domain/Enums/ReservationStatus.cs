@@ -6,8 +6,10 @@ namespace Tabeeb.Domain.Enums
 {
     public enum  ReservationStatus
     {
-        Completed=1,
-        NotAttended,
-        Canceled
+      Confirmed=1,
+      canceled,
+      Completed,
+      Expired,
+      PendingPayment
     }
 }

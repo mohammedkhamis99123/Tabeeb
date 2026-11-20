@@ -13,7 +13,7 @@ namespace Tabeeb.Application.Areas.Offer.Commands.UpdateOffer
 {
     public  class UpdateOffer:IRequest
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public DateTime StartAt { get; set; }
 
@@ -43,10 +43,20 @@ namespace Tabeeb.Application.Areas.Offer.Commands.UpdateOffer
                 throw new ItemNotFoundException(localizer["NotFound"]);
 
             var data = request.Adapt<Domain.Entities.Offer>();
-            data.ClinicId = currentUserService.ClinicId.Value;
+           
 
             appDbContext.Offers.Update(data);
 
+            var doctorClinic = appDbContext.doctorClinics
+              .Where(a =>  a.OfferId == request.Id).FirstOrDefault();
+
+            doctorClinic.OfferId = null;
+
+
+            var NewdoctorClinic = appDbContext.doctorClinics
+             .Where(a => a.DoctorId == request.DoctorId && a.ClinicId == currentUserService.ClinicId).FirstOrDefault();
+
+            doctorClinic.OfferId = data.Id;
             await appDbContext.SaveChangesAsync(cancellationToken);
         }
     }

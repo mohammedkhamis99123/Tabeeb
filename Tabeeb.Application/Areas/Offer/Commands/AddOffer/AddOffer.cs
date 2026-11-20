@@ -36,10 +36,17 @@ namespace Tabeeb.Application.Areas.Offer.Commands.AddOffer
         public async Task Handle(AddOffer request, CancellationToken cancellationToken)
         {
 
+
             var data = request.Adapt<Domain.Entities.Offer>();
-            data.ClinicId = currentUserService.ClinicId.Value;
+            //data. = currentUserService.ClinicId.Value;
 
             await appDbContext.Offers.AddAsync(data);
+
+            var doctorClinic = appDbContext.doctorClinics
+                .Where(a => a.DoctorId == request.DoctorId && a.ClinicId == currentUserService.ClinicId).FirstOrDefault();
+
+            doctorClinic.OfferId = data.Id;
+
 
             await appDbContext.SaveChangesAsync(cancellationToken);
         }

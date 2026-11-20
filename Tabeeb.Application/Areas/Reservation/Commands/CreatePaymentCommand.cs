@@ -1,131 +1,110 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Tabeeb.Application.Common;
+using Tabeeb.Application.Common.Exceptions;
 using Tabeeb.Application.Common.Services;
 using Tabeeb.Domain.Entities;
 using Tabeeb.Domain.Enums;
+using Tabeeb.Resources;
 
 namespace Tabeeb.Application.Areas.Reservation.Commands
 {
 
 
-    public class CreatePaymentCommand : IRequest<PaymentInitiationResult>
+    public class CreateReservationCommand : IRequest<PaymentInitiationResult>
     {
         public PaymentPurpose Purpose { get; set; }
 
-        public long? ReservationId { get; set; }
+        public DateTime Date { get; set; }
 
-        public long? SubscriptionId { get; set; }
+
+
+        public long CustomerId { get; set; }
+
+
+
+        public int DoctorID { get; set; }
+
+
+
+
+  
     }
-    public class CreatePaymentCommandHandler
-    : IRequestHandler<CreatePaymentCommand, PaymentInitiationResult>
+    public class CreateReservationCommandHandler
+    : IRequestHandler<CreateReservationCommand, PaymentInitiationResult>
     {
         private readonly IAppDbContext _context;
         private readonly IPaymentGateway _paymentGateway;
+        private readonly ICurrentUserService currentUserService;
+        private readonly IStringLocalizer<SharedResource> localizer;
 
-        public CreatePaymentCommandHandler(
+        public CreateReservationCommandHandler(
             IAppDbContext context,
-            IPaymentGateway paymentGateway)
+            IPaymentGateway paymentGateway,
+            ICurrentUserService currentUserService,
+            IStringLocalizer<SharedResource> localizer)
         {
             _context = context;
             _paymentGateway = paymentGateway;
+           this.currentUserService = currentUserService;
+            this.localizer = localizer;
         }
 
         public async Task<PaymentInitiationResult> Handle(
-            CreatePaymentCommand request,
+            CreateReservationCommand request,
             CancellationToken cancellationToken)
         {
-            // 1. Validate request
-            if (request.Purpose == PaymentPurpose.PatientReservation &&
-                (!request.ReservationId.HasValue || request.SubscriptionId.HasValue))
+
+
+            var DoctorClinic = await _context.doctorClinics
+                .Include(a=>a.Offer)
+                .Where(a => a.DoctorId == request.DoctorID 
+                && a.ClinicId == currentUserService.ClinicId)
+                .FirstOrDefaultAsync();
+
+
+            var offerPercent = DoctorClinic.Offer != null
+               ? (request.Date >= DoctorClinic.Offer.StartAt 
+               && request.Date <= DoctorClinic.Offer.EndAt
+               && DoctorClinic.Offer.IsActive)
+               ? DoctorClinic.Offer.Percentage
+               : 0
+               : 0;
+
+
+            var Customer = _context.Customers.Where(a => a.Id == request.CustomerId ).FirstOrDefault();
+
+            if (Customer is null)
+                throw new ItemNotFoundException(localizer["NotFound"]);
+
+            var Amount = DoctorClinic.SessionPrice - (DoctorClinic.SessionPrice * offerPercent) / 100;
+
+ 
+
+            var reservation = new Domain.Entities.Reservation
             {
-                throw new ArgumentException(
-                    "A valid ReservationId is required for reservation payment.");
-            }
+                ClinicId = currentUserService.ClinicId.Value,
+                CustomerId = request.CustomerId,
+                DoctorID = request.DoctorID,
+                OfferId = offerPercent >0 ?null :DoctorClinic.OfferId,
+                Status = ReservationStatus.PendingPayment,
+                TotalBeforeDiscount=DoctorClinic.SessionPrice,
+                TotalAfterDiscount=Amount,
+                Type=ReservationType.New,
+                
 
-            if (request.Purpose == PaymentPurpose.ClinicSubscription &&
-                (!request.SubscriptionId.HasValue || request.ReservationId.HasValue))
-            {
-                throw new ArgumentException(
-                    "A valid SubscriptionId is required for subscription payment.");
-            }
+            };
 
-            decimal amount;
-            int clinicId;
-            string itemName;
-            string customerName;
-            string customerEmail;
-            string customerPhone;
+            await _context.Reservations.AddAsync(reservation);
 
-            long? reservationId = null;
-            long? subscriptionId = null;
+            await _context.SaveChangesAsync();
 
-            // 2. Determine payment data from database
-            switch (request.Purpose)
-            {
-                case PaymentPurpose.PatientReservation:
-                    {
-                        var reservation = await _context.Reservations
-                            .Include(r => r.Customer)
-                            .FirstOrDefaultAsync(
-                                r => r.Id == request.ReservationId,
-                                cancellationToken);
 
-                        if (reservation == null)
-                            throw new KeyNotFoundException("Reservation not found.");
-
-                        if (reservation.TotalAmount <= 0)
-                            throw new InvalidOperationException(
-                                "Reservation amount must be greater than zero.");
-
-                        amount = reservation.TotalAmount;
-                        clinicId = reservation.ClinicId;
-                        reservationId = reservation.Id;
-
-                        itemName = $"Reservation #{reservation.ReservationNo}";
-                        customerName = reservation.Customer.ArName;
-                        customerEmail = reservation.Customer.Email;
-                        customerPhone = reservation.Customer.PhoneNumber;
-
-                        break;
-                    }
-
-                case PaymentPurpose.ClinicSubscription:
-                    {
-                        var subscription = await _context.Subscriptions
-                            .Include(s => s.Package)
-                            .Include(s => s.Clinics)
-                            .FirstOrDefaultAsync(
-                                s => s.Id == request.SubscriptionId,
-                                cancellationToken);
-
-                        if (subscription == null)
-                            throw new KeyNotFoundException("Subscription not found.");
-
-                        if (subscription.Package.Price <= 0)
-                            throw new InvalidOperationException(
-                                "Subscription amount must be greater than zero.");
-
-                        amount = subscription.Package.Price;
-                        clinicId = subscription.ClinicId;
-                        subscriptionId = subscription.Id;
-
-                        itemName = subscription.Package.EnName;
-                        customerName = subscription.Clinics.OwnerEnName;
-                        customerEmail = subscription.Clinics.OwnerEmail;
-                        customerPhone = subscription.Clinics.WhatsappNumber;
-
-                        break;
-                    }
-
-                default:
-                    throw new ArgumentOutOfRangeException(
-                        nameof(request.Purpose),
-                        "Unsupported payment purpose.");
-            }
+     
 
             // 3. Create local payment transaction
             var payment = new PaymentTransaction
@@ -133,11 +112,11 @@ namespace Tabeeb.Application.Areas.Reservation.Commands
                 Reference = Guid.NewGuid(),
                 Purpose = request.Purpose,
                 Status = PaymentStatus.Pending,
-                Amount = amount,
+                Amount = Amount,
                 Currency = "EGP",
-                ClinicId = clinicId,
-                ReservationId = reservationId,
-                SubscriptionId = subscriptionId,
+                ClinicId = currentUserService.ClinicId.Value,
+                ReservationId = reservation.Id,
+                SubscriptionId = null,
                 Provider = "Paymob"
             };
 
@@ -153,10 +132,9 @@ namespace Tabeeb.Application.Areas.Reservation.Commands
                     Reference = payment.Reference,
                     Amount = payment.Amount,
                     Currency = payment.Currency,
-                    ItemName = itemName,
-                    CustomerName = customerName,
-                    CustomerEmail = customerEmail,
-                    CustomerPhone = customerPhone
+                    CustomerName = Customer.EnName,
+                    CustomerEmail = Customer.Email,
+                    CustomerPhone = Customer.PhoneNumber
                 };
 
                 // 5. Create payment with Paymob

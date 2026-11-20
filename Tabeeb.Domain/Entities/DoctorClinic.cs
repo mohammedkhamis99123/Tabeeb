@@ -23,5 +23,9 @@ namespace Tabeeb.Domain.Entities
 
         public bool IsActive { get; set; }
         public DateTime JoinDate { get; set; }
+
+        public int? OfferId {  get; set; }
+
+        public Offer? Offer { get; set; }
     }
 }

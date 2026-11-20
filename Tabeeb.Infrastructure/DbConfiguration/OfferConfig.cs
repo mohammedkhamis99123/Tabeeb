@@ -6,23 +6,23 @@ using Tabeeb.Domain.Entities;
 
 namespace Tabeeb.Infrastructure.DbConfiguration
 {
-    public static  class OfferConfig
+    public static class OfferConfig
     {
         public static void RunConfig(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Offer>(opt =>
             {
                 opt.Property(a => a.Percentage).HasColumnType("decimal(3,2)");
-                opt.HasOne(a => a.Doctor)
-                   .WithMany(a => a.Offers)
-                    .HasForeignKey(a => a.DoctorId)
+                opt.HasOne(a => a.doctorClinic)
+                   .WithOne(a => a.Offer)
+                    .HasForeignKey<DoctorClinic>(a => a.OfferId)
                     .HasConstraintName("FK_Offer_Doctor")
                     .OnDelete(DeleteBehavior.NoAction);
 
-                opt.HasOne(a => a.Clinic)
-                  .WithMany(a => a.Offers)
-                   .HasForeignKey(a => a.ClinicId)
-                   .HasConstraintName("FK_Offer_Clinic")
+                opt.HasMany(a => a.Reservations)
+                   .WithOne(a => a.Offer)
+                   .HasForeignKey(a => a.OfferId)
+                   .HasConstraintName("FK_Reservation_Offer")
                    .OnDelete(DeleteBehavior.NoAction);
 
                 opt.HasOne(a => a.Creator)

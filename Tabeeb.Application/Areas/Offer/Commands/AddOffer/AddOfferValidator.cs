@@ -53,8 +53,8 @@ namespace Tabeeb.Application.Areas.Offer.Commands.AddOffer
         private bool ValidateCycle(AddOffer x)
         {
             return !appDbContext
-                .Offers.Any(a => a.DoctorId == x.DoctorId
-                && a.ClinicId == currentUserService.ClinicId
+                .Offers.Any(a => a.doctorClinic.DoctorId == x.DoctorId
+                && a.doctorClinic.ClinicId == currentUserService.ClinicId
                 && a.IsActive
                 &&(( x.EndAt <= a.EndAt && x.StartAt>=a.StartAt)
                 ||(a.StartAt >= x.StartAt && a.EndAt<=x.EndAt ) 

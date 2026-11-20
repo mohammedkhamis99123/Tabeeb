@@ -18,13 +18,16 @@ namespace Tabeeb.Domain.Entities
 
         public bool IsActive { get; set; }
         
-        public int DoctorId {  get; set; }
+        //public int DoctorId {  get; set; }
 
-        public Doctor Doctor { get; set; } = null!;
+        //public Doctor Doctor { get; set; } = null!;
 
-        public int ClinicId { get; set; }
+        //public int ClinicId { get; set; }
 
-        public Clinic Clinic { get; set; } = null!;
+        //public Clinic Clinic { get; set; } = null!;
+
+
+        public DoctorClinic doctorClinic { get; set; }
 
 
         public IEnumerable<Reservation> Reservations { get; set; }

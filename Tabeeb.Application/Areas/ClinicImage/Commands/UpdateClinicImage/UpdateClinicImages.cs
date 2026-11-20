@@ -45,22 +45,35 @@ namespace Tabeeb.Application.Areas.ClinicImage.Commands.UpdateClinicImage
             if (request.DeleteBannerImage.HasValue && request.DeleteBannerImage.Value)
             {
                var banner= clinicImages.Where(A => A.ImageType == ImageType.Banner).FirstOrDefault();
-                appDbContext.ClinicImages.Remove(banner);
-                await appDbContext.SaveChangesAsync();
+                if (banner != null)
+                {
+                    appDbContext.ClinicImages.Remove(banner);
+                    await appDbContext.SaveChangesAsync();
+                }
+             
             }
 
             if (request.DeleteLogoImage.HasValue && request.DeleteLogoImage.Value)
             {
                 var logo = clinicImages.Where(A => A.ImageType == ImageType.Logo).FirstOrDefault();
-                appDbContext.ClinicImages.Remove(logo);
-                await appDbContext.SaveChangesAsync();
+                if (logo != null)
+                {
+                    appDbContext.ClinicImages.Remove(logo);
+                    await appDbContext.SaveChangesAsync();
+                }
+                
             }
 
             if (request.DeleteInvoiceLogoImage.HasValue && request.DeleteInvoiceLogoImage.Value)
             {
+                
                 var InvoiceLogoImage = clinicImages.Where(A => A.ImageType == ImageType.invoiceLogo).FirstOrDefault();
-                appDbContext.ClinicImages.Remove(InvoiceLogoImage);
-                await appDbContext.SaveChangesAsync();
+                if (InvoiceLogoImage != null)
+                {
+                    appDbContext.ClinicImages.Remove(InvoiceLogoImage);
+                    await appDbContext.SaveChangesAsync();
+                }
+              
             }
 
             if (request.BannerImage!=null)

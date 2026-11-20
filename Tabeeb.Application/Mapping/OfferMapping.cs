@@ -15,8 +15,8 @@ namespace Tabeeb.Application.Mapping
         {
             TypeAdapterConfig<Offer, OfferDto>
                 .NewConfig()
-                .Map(src => src.DoctorArName, dest => dest.Doctor.ArName)
-                .Map(src => src.DoctorEnName, dest => dest.Doctor.EnName);
+                .Map(src => src.DoctorArName, dest => dest.doctorClinic.Doctor.ArName)
+                .Map(src => src.DoctorEnName, dest => dest.doctorClinic.Doctor.EnName);
           
 
 

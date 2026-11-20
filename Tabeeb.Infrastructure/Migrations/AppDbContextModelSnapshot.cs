@@ -711,6 +711,9 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.Property<DateTime>("JoinDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("OfferId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SessionDuration")
                         .HasColumnType("int");
 
@@ -720,6 +723,10 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.HasKey("ClinicId", "DoctorId");
 
                     b.HasIndex("DoctorId");
+
+                    b.HasIndex("OfferId")
+                        .IsUnique()
+                        .HasFilter("[OfferId] IS NOT NULL");
 
                     b.ToTable("DoctorClinic", (string)null);
                 });
@@ -839,6 +846,9 @@ namespace Tabeeb.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Salary")
+                        .HasColumnType("decimal(8,2)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -848,6 +858,9 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("WorkHours")
+                        .HasColumnType("decimal(4,2)");
 
                     b.HasKey("Id");
 
@@ -980,7 +993,7 @@ namespace Tabeeb.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ClinicId")
+                    b.Property<int?>("ClinicId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -995,7 +1008,7 @@ namespace Tabeeb.Infrastructure.Migrations
                     b.Property<string>("DeletedBy")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("DoctorId")
+                    b.Property<int?>("DoctorId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndAt")
@@ -1321,14 +1334,14 @@ namespace Tabeeb.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("ReservationNo")
-                        .HasColumnType("bigint");
-
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(5,2)");
+                    b.Property<decimal>("TotalAfterDiscount")
+                        .HasColumnType("decimal(8,2)");
+
+                    b.Property<decimal>("TotalBeforeDiscount")
+                        .HasColumnType("decimal(8,2)");
 
                     b.Property<byte>("Type")
                         .HasColumnType("tinyint");
@@ -1928,9 +1941,17 @@ namespace Tabeeb.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("FK_DoctorClinic_Doctor");
 
+                    b.HasOne("Tabeeb.Domain.Entities.Offer", "Offer")
+                        .WithOne("doctorClinic")
+                        .HasForeignKey("Tabeeb.Domain.Entities.DoctorClinic", "OfferId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("FK_Offer_Doctor");
+
                     b.Navigation("Clinic");
 
                     b.Navigation("Doctor");
+
+                    b.Navigation("Offer");
                 });
 
             modelBuilder.Entity("Tabeeb.Domain.Entities.DoctorWorkTime", b =>
@@ -2105,12 +2126,9 @@ namespace Tabeeb.Infrastructure.Migrations
 
             modelBuilder.Entity("Tabeeb.Domain.Entities.Offer", b =>
                 {
-                    b.HasOne("Tabeeb.Domain.Entities.Clinic", "Clinic")
+                    b.HasOne("Tabeeb.Domain.Entities.Clinic", null)
                         .WithMany("Offers")
-                        .HasForeignKey("ClinicId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_Offer_Clinic");
+                        .HasForeignKey("ClinicId");
 
                     b.HasOne("Tabeeb.Domain.Entities.AppUser", "Creator")
                         .WithMany("OfferCreatedBy")
@@ -2124,12 +2142,9 @@ namespace Tabeeb.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .HasConstraintName("FK_Offer_Delete");
 
-                    b.HasOne("Tabeeb.Domain.Entities.Doctor", "Doctor")
+                    b.HasOne("Tabeeb.Domain.Entities.Doctor", null)
                         .WithMany("Offers")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_Offer_Doctor");
+                        .HasForeignKey("DoctorId");
 
                     b.HasOne("Tabeeb.Domain.Entities.AppUser", "Updater")
                         .WithMany("OfferUpdatedBy")
@@ -2137,13 +2152,9 @@ namespace Tabeeb.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .HasConstraintName("FK_Offer_Update");
 
-                    b.Navigation("Clinic");
-
                     b.Navigation("Creator");
 
                     b.Navigation("Deleter");
-
-                    b.Navigation("Doctor");
 
                     b.Navigation("Updater");
                 });
@@ -2689,6 +2700,9 @@ namespace Tabeeb.Infrastructure.Migrations
             modelBuilder.Entity("Tabeeb.Domain.Entities.Offer", b =>
                 {
                     b.Navigation("Reservations");
+
+                    b.Navigation("doctorClinic")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Tabeeb.Domain.Entities.Permission", b =>
