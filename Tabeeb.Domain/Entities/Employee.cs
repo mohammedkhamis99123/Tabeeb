@@ -36,7 +36,7 @@ namespace Tabeeb.Domain.Entities
 
         public decimal Salary {  get; set; }
 
-        public decimal WorkHours {  get; set; }
+        public int WorkHours {  get; set; }
 
 
 

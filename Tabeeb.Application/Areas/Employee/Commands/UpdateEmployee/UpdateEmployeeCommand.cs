@@ -39,6 +39,10 @@ namespace Tabeeb.Application.Areas.Employee.Commands.UpdateEmployee
 
 
         public string Role { get; set; }
+
+        public decimal Salary { get; set; }
+
+        public int WorkHours { get; set; }
     }
     public class UpdateEmployeeCommandHandler
         (IAppDbContext appDbContext,

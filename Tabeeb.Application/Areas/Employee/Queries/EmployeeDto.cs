@@ -29,5 +29,9 @@ namespace Tabeeb.Application.Areas.Employee.Queries
 
         public string Email { get; set; } = null!;
 
+        public decimal Salary { get; set; }
+
+        public int WorkHours { get; set; }
+
     }
 }

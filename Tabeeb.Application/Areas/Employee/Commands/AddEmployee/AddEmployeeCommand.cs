@@ -36,6 +36,11 @@ namespace Tabeeb.Application.Areas.Employee.Commands.AddEmployee
         public string Role { get; set; }
 
 
+        public decimal Salary {  get; set; }
+
+        public int WorkHours { get; set; }
+
+
 
 
      

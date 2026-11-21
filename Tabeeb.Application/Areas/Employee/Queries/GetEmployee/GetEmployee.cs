@@ -34,7 +34,7 @@ namespace Tabeeb.Application.Areas.Employee.Queries.GetEmployee
 
             var user = await userManager.FindByIdAsync(item.UserId);
             var roleName =  await userManager.GetRolesAsync(user);
-         
+
             var data = new EmployeeDto
             {
                 Addrees = item.Addrees,
@@ -46,7 +46,9 @@ namespace Tabeeb.Application.Areas.Employee.Queries.GetEmployee
                 ImagePath = item.ImagePath,
                 IsActive = item.IsActive,
                 PhoneNumber = item.PhoneNumber,
-                Role = roleName[0]
+                Role = roleName[0],
+                Salary = item.Salary,
+                WorkHours = item.WorkHours
             };
 
             return data;
